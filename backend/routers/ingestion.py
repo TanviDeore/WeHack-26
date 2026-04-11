@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from backend.models.timeseries import TelemetryDataPoint
-from backend.database.influxdb_client import influx_client
 from backend.database.redis_client import redis_client
 from backend.database.neo4j_client import neo4j_client
 
@@ -26,16 +25,9 @@ async def ingest_telemetry(data: TelemetryDataPoint):
             # Create active alert
             redis_client.set_state(f"alert:{data.dc_id}", {"alert": "cooling_stress_detected", "severity": "high"})
 
-        # 2. Update Historical Memory (InfluxDB)
-        influx_client.write_telemetry(
-            dc_id=data.dc_id,
-            temp=data.temperature,
-            cpu=data.cpu_usage,
-            pue=data.pue,
-            latency=data.latency_ms,
-            event_type=data.event_type
-        )
+        # 2. Update Historical Memory (InfluxDB) - REMOVED
         
+
         # 3. IF event is severe, log it into Long-Term Memory (Neo4j)
         if data.event_type and "failure" in data.event_type:
             incident_id = f"inc_{data.dc_id}_{int(data.temperature)}"

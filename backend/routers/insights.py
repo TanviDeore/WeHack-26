@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from backend.database.redis_client import redis_client
-from backend.database.influxdb_client import influx_client
 from backend.database.neo4j_client import neo4j_client
 
 router = APIRouter()
@@ -14,13 +13,8 @@ async def get_agent_context(dc_id: str):
     active_alert = redis_client.get_state(f"alert:{dc_id}")
     recent_events = redis_client.get_recent_events(f"recent:event:{dc_id}")
 
-    # 2. Gather Historical Context (InfluxDB)
-    # Get telemetry over last 60 minutes
-    recent_history_raw = influx_client.query_recent_telemetry(dc_id, minutes_ago=60)
-    
-    # Simple calculation for average temperature over last hour
-    temps = [val for field, val, _ in recent_history_raw if field == "temperature"]
-    avg_temp_1h = sum(temps) / len(temps) if temps else None
+    # 2. Historical Context (Removed from Timeseries)
+    avg_temp_1h = None
 
     # 3. Gather Long-Term Causality (Neo4j)
     # Find past incidents and cooling systems for this DC
@@ -40,8 +34,7 @@ async def get_agent_context(dc_id: str):
             "recent_events": recent_events
         },
         "historical": {
-            "avg_temp_last_hour": avg_temp_1h,
-            "data_points_analyzed": len(temps)
+            "avg_temp_last_hour": "N/A (Timeseries Removed)"
         },
         "long_term": {
             "cooling_system": long_term_data[0]["cooling_system"] if long_term_data else "Unknown",
