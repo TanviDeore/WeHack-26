@@ -8,6 +8,9 @@ class RealtimeStateModel(BaseModel):
     cpu_load: float
     power_usage: float
     latency: float
+    cooling_system_rpm: Optional[float] = None
+    network_packet_loss: Optional[float] = None
+    active_memory_gb: Optional[float] = None
 
 class AlertModel(BaseModel):
     dc_id: str
