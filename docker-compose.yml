@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: memory_redis
+    ports:
+      - "6379:6379"
+
+  neo4j:
+    image: neo4j:5.26.2
+    container_name: memory_neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/password
+      # Allow APOC plugins for advanced graph capabilities
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+    ports:
+      - "7474:7474"   # HTTP interface
+      - "7687:7687"   # Bolt interface
+    volumes:
+      - neo4j_data:/data
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: memory_influx
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpassword
+      - DOCKER_INFLUXDB_INIT_ORG=cbre
+      - DOCKER_INFLUXDB_INIT_BUCKET=telemetry
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
+volumes:
+  neo4j_data:
+  influxdb_data:
