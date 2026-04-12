@@ -40,7 +40,8 @@ const Home = () => {
   const markers = useMemo(() => {
     return datacenters.map((dc, index) => {
       // Find the state name by matching against our coords keys
-      const stateMatch = Object.keys(STATE_COORDS).find(st => dc.name.includes(st));
+      const stateName = dc.name || "";
+      const stateMatch = Object.keys(STATE_COORDS).find(st => stateName.includes(st));
       if (!stateMatch) return null;
       
       const baseCoord = STATE_COORDS[stateMatch];

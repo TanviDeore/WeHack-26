@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const OperationsAgent = ({ dcIdProp }) => {
-  const [dcId, setDcId] = useState(dcIdProp || 'texas');
+  const [dcId, setDcId] = useState(dcIdProp || 'dc_usa_1');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [actionStatus, setActionStatus] = useState({}); // { title: 'committing' | 'success' }

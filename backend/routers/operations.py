@@ -34,6 +34,9 @@ async def run_operations_agent(dc_id: str):
 async def get_raw_telemetry(dc_id: str):
     """Fetch lightweight live metrics purely from Redis without LLM."""
     try:
+        # Mark this DC as active for the simulator
+        redis_client.r.set("active_dc", dc_id)
+        
         keys_to_fetch = ["status", "temp", "cpu_load", "power_usage", "latency", "fan_speed_rpm", "network_bandwidth_gbps"]
         metrics = {}
         for k in keys_to_fetch:

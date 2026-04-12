@@ -8,16 +8,32 @@ def simulate_realtime_data():
     port = int(os.getenv("REDIS_PORT", 6379))
     r = redis.Redis(host=host, port=port, db=0, decode_responses=True)
     
-    print("🚀 Starting Live Redis Log Simulator...")
+    print("🚀 Starting Reactive Live Redis Log Simulator...")
     print("Press Ctrl+C to stop.")
     
     datacenters = [f"dc_usa_{i}" for i in range(1, 51)]
     
     try:
         while True:
+            # Check for focused data center from the frontend
+            active_dc = r.get("active_dc")
+            if active_dc:
+                print(f"🎯 Simulation focused on: {active_dc}")
+                if active_dc not in datacenters:
+                    datacenters.append(active_dc) # Ensure it gets data
+            
             for dc in datacenters:
                 # 1. Base metrics (Normal Operation)
-                is_incident = (dc == "dc_usa_1" and random.random() > 0.7) # dc_usa_1 has occasional incident spikes
+                # If active_dc is set, give it a 30% chance of an incident every loop
+                # Others have a very small random chance
+                is_active = (dc == active_dc)
+                
+                if is_active:
+                    # Focused DC has high probability of being 'interesting'
+                    is_incident = random.random() > 0.7 
+                else:
+                    # Background DCs rarely have incidents
+                    is_incident = random.random() > 0.98
                 
                 status = "degraded" if is_incident else "optimal"
                 temp = random.randint(85, 105) if is_incident else random.randint(65, 75)
@@ -31,6 +47,7 @@ def simulate_realtime_data():
                 power_draw_kw = power_usage * random.randint(10, 15)
                 network_bandwidth_gbps = random.uniform(8.0, 10.0) if is_incident else random.uniform(2.0, 5.0)
                 coolant_temp_out = (temp + random.randint(30, 50)) if is_incident else (temp + 15)
+
                 # 2. Write to flat Redis Keys
                 r.set(f"dc:{dc}:status", status)
                 r.set(f"dc:{dc}:temp", temp)
@@ -50,8 +67,6 @@ def simulate_realtime_data():
                 else:
                     r.delete(f"alert:{dc}") # Clear alert if normal
 
-            print(f"[{time.strftime('%H:%M:%S')}] Pushed live metrics for {len(datacenters)} Data Centers. (DC 1 Status: {r.get('dc:dc_usa_1:status')})")
-            
             # Send data every 3 seconds
             time.sleep(3)
             
