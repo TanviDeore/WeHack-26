@@ -55,9 +55,9 @@ const Home = () => {
       const stateName = dc.name || "";
       const stateMatch = Object.keys(STATE_COORDS).find(st => stateName.includes(st));
       if (!stateMatch) return null;
-      
+
       const baseCoord = STATE_COORDS[stateMatch];
-      
+
       // Jitter so they don't overlap exactly (deterministic based on index)
       const jitterX = (prng(index) - 0.5) * 3.5; // +/- longitude
       const jitterY = (prng(index + 100) - 0.5) * 3.5; // +/- latitude
@@ -72,23 +72,27 @@ const Home = () => {
   return (
     <div className="home-container" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <section className="hero-section" style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <h1 className="hero-title" style={{ fontSize: '3.5rem', marginBottom: '1rem', color: '#fff' }}>Intelligent Nexus</h1>
+        <h1 className="hero-title" style={{ fontSize: '3.5rem', marginBottom: '1rem', color: '#fff' }}>CenterMind AI</h1>
         <p className="hero-subtitle" style={{ fontSize: '1.2rem', color: '#ccc', maxWidth: '800px', margin: '0 auto' }}>
           Select a Data Center to enter its predictive operations dashboard, or coordinate organization-wide tasks.
         </p>
       </section>
 
       {/* Map Section */}
-      <div 
-        className="map-container" 
-        style={{ 
-          width: '100%', 
-          maxWidth: '1000px', 
-          backgroundColor: '#111', 
-          borderRadius: '16px', 
-          border: '1px solid #333',
+      <div
+        className="map-container"
+        style={{
+          width: '100%',
+          maxWidth: '1000px',
+          background: 'rgba(10, 10, 26, 0.4)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderRadius: '24px',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 240, 255, 0.02)',
           padding: '2rem',
-          position: 'relative'
+          position: 'relative',
+          marginBottom: '2rem'
         }}
       >
         {hoveredDc && (
@@ -111,18 +115,29 @@ const Home = () => {
         )}
 
         <ComposableMap projection="geoAlbersUsa">
+          <defs>
+            <linearGradient id="mapGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="800" y2="500">
+              <stop offset="0%" stopColor="#0a0a20" />
+              <stop offset="50%" stopColor="#121235" />
+              <stop offset="100%" stopColor="#0a0a20" />
+            </linearGradient>
+            <filter id="mapGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
           <Geographies geography={geoUrl}>
             {({ geographies }) =>
               geographies.map(geo => (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
-                  fill="#1a1a1a"
-                  stroke="#333"
+                  fill="url(#mapGradient)"
+                  stroke="rgba(0, 240, 255, 0.2)"
                   strokeWidth={0.5}
                   style={{
-                    default: { outline: "none" },
-                    hover: { outline: "none", fill: "#222" },
+                    default: { outline: "none", filter: "url(#mapGlow)" },
+                    hover: { outline: "none", fill: "rgba(0, 240, 255, 0.1)", stroke: "rgba(0, 240, 255, 0.6)" },
                     pressed: { outline: "none" },
                   }}
                 />
@@ -143,16 +158,24 @@ const Home = () => {
           ))}
 
           {markers.map((marker) => (
-            <Marker 
-              key={marker.id} 
+            <Marker
+              key={marker.id}
               coordinates={marker.coordinates}
               onClick={() => navigate(`/datacenter/${marker.id}`)}
               onMouseEnter={() => setHoveredDc(marker)}
               onMouseLeave={() => setHoveredDc(null)}
               style={{ cursor: 'pointer' }}
             >
-              <circle r={hoveredDc?.id === marker.id ? 8 : 4} fill={hoveredDc?.id === marker.id ? "#00ea93" : "#00ccff"} />
-              <circle r={12} fill="transparent" /> {/* Larger hit area */}
+              {/* Pulsing effect */}
+              <circle
+                r={6}
+                fill={hoveredDc?.id === marker.id ? "#00ea93" : "#00ccff"}
+                className="pulse-marker"
+                style={{ pointerEvents: 'none' }}
+              />
+
+              <circle r={hoveredDc?.id === marker.id ? 6 : 3} fill={hoveredDc?.id === marker.id ? "#00ea93" : "#00ccff"} />
+              <circle r={10} fill="transparent" /> {/* Larger hit area */}
             </Marker>
           ))}
         </ComposableMap>
@@ -160,12 +183,12 @@ const Home = () => {
 
       {/* Call to Actions below map */}
       <div style={{ marginTop: '3rem', width: '100%', maxWidth: '1000px', display: 'flex', justifyContent: 'center' }}>
-        <Link 
-          to="/planning" 
-          className="agent-card" 
-          style={{ 
-            textDecoration: 'none', 
-            background: 'rgba(255,255,255,0.05)', 
+        <Link
+          to="/planning"
+          className="agent-card"
+          style={{
+            textDecoration: 'none',
+            background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.1)',
             padding: '2rem',
             borderRadius: '12px',
@@ -188,7 +211,9 @@ const Home = () => {
             e.currentTarget.style.boxShadow = 'none';
           }}
         >
-          <div className="card-icon" style={{ fontSize: '3rem', marginBottom: '1rem' }}>🧠</div>
+          <div className="card-icon" style={{ width: '120px', height: '120px', marginBottom: '1.5rem' }}>
+            <img src="/planning_icon.png" alt="Planning Agent" style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }} />
+          </div>
           <h2 className="card-title" style={{ color: '#fff', marginBottom: '0.5rem' }}>Global Planning Agent</h2>
           <p className="card-description" style={{ color: '#aaa', fontSize: '0.9rem', lineHeight: '1.5' }}>
             Coordinates strategic timelines, visualizes workflows, and prepares actionable tasks across all data centers globally.

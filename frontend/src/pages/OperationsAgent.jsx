@@ -86,7 +86,7 @@ const OperationsAgent = ({ dcIdProp }) => {
   };
 
   const handleApproveAction = async (actionTitle) => {
-    const rootCauseTag = data.anomalies && data.anomalies[0]?.startsWith('TAGS: ') 
+    const rootCauseTag = data.anomalies && data.anomalies[0]?.startsWith('TAGS: ')
       ? data.anomalies[0].replace('TAGS: ', '').split(',')[0]
       : 'unknown';
 
@@ -104,7 +104,7 @@ const OperationsAgent = ({ dcIdProp }) => {
       });
       if (!res.ok) throw new Error('Feedback failed');
       setActionStatus(prev => ({ ...prev, [actionTitle]: 'success' }));
-      
+
       // Auto-resume monitoring after 2 seconds
       setTimeout(() => {
         resumeScan();
@@ -128,7 +128,7 @@ const OperationsAgent = ({ dcIdProp }) => {
           action_taken: `REJECTED: ${actionTitle}`
         })
       });
-      
+
       // Remove this action from local state
       setData(prev => ({
         ...prev,
@@ -171,7 +171,9 @@ const OperationsAgent = ({ dcIdProp }) => {
 
       {!dcIdProp && (
         <div className="agent-header">
-          <div className="card-icon">⚙️</div>
+          <div className="card-icon" style={{ width: '120px', height: '120px', marginBottom: '1.5rem' }}>
+            <img src="/operations.png" alt="Operations Agent" style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }} />
+          </div>
           <div>
             <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: '0.2rem', textAlign: 'left' }}>Operations Agent</h1>
             <p className="hero-subtitle" style={{ margin: 0, textAlign: 'left' }}>Auto-Pilot GraphRAG System</p>
@@ -285,7 +287,7 @@ const OperationsAgent = ({ dcIdProp }) => {
                   {data.recommended_actions && data.recommended_actions.length > 0 && (
                     <div className="ai-recommendation">
                       <div style={{ fontSize: '0.8rem', letterSpacing: '2px', marginBottom: '1rem', opacity: 0.8 }}>RECOMMENDED ACTIONS</div>
-                      
+
                       {data.recommended_actions.map((action, idx) => (
                         <div key={idx} style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(0, 0, 0, 0.2)', borderRadius: '8px', borderLeft: '4px solid var(--accent-1)' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: action.action_explanation ? '0.5rem' : '1.5rem' }}>
@@ -298,7 +300,7 @@ const OperationsAgent = ({ dcIdProp }) => {
                               </div>
                             )}
                           </div>
-                          
+
                           {action.action_explanation && (
                             <div style={{ lineHeight: '1.4', fontSize: '0.9rem', color: '#ccc', marginBottom: '1.5rem', fontStyle: 'italic' }}>
                               💡 {action.action_explanation}
@@ -343,8 +345,8 @@ const OperationsAgent = ({ dcIdProp }) => {
 
                       {data.recommended_actions.length > 0 && (
                         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                          <button 
-                            onClick={resumeScan} 
+                          <button
+                            onClick={resumeScan}
                             style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.5)', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
                           >
                             IGNORE ALL & RESUME MONITORING

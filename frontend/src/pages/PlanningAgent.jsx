@@ -6,19 +6,19 @@ const geoUrl = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
 
 // State name → FIPS code mapping for Geography fills
 const STATE_FIPS = {
-  "Alabama":"01","Alaska":"02","Arizona":"04","Arkansas":"05","California":"06",
-  "Colorado":"08","Connecticut":"09","Delaware":"10","Florida":"12","Georgia":"13",
-  "Hawaii":"15","Idaho":"16","Illinois":"17","Indiana":"18","Iowa":"19","Kansas":"20",
-  "Kentucky":"21","Louisiana":"22","Maine":"23","Maryland":"24","Massachusetts":"25",
-  "Michigan":"26","Minnesota":"27","Mississippi":"28","Missouri":"29","Montana":"30",
-  "Nebraska":"31","Nevada":"32","New Hampshire":"33","New Jersey":"34","New Mexico":"35",
-  "New York":"36","North Carolina":"37","North Dakota":"38","Ohio":"39","Oklahoma":"40",
-  "Oregon":"41","Pennsylvania":"42","Rhode Island":"44","South Carolina":"45",
-  "South Dakota":"46","Tennessee":"47","Texas":"48","Utah":"49","Vermont":"50",
-  "Virginia":"51","Washington":"53","West Virginia":"54","Wisconsin":"55","Wyoming":"56"
+  "Alabama": "01", "Alaska": "02", "Arizona": "04", "Arkansas": "05", "California": "06",
+  "Colorado": "08", "Connecticut": "09", "Delaware": "10", "Florida": "12", "Georgia": "13",
+  "Hawaii": "15", "Idaho": "16", "Illinois": "17", "Indiana": "18", "Iowa": "19", "Kansas": "20",
+  "Kentucky": "21", "Louisiana": "22", "Maine": "23", "Maryland": "24", "Massachusetts": "25",
+  "Michigan": "26", "Minnesota": "27", "Mississippi": "28", "Missouri": "29", "Montana": "30",
+  "Nebraska": "31", "Nevada": "32", "New Hampshire": "33", "New Jersey": "34", "New Mexico": "35",
+  "New York": "36", "North Carolina": "37", "North Dakota": "38", "Ohio": "39", "Oklahoma": "40",
+  "Oregon": "41", "Pennsylvania": "42", "Rhode Island": "44", "South Carolina": "45",
+  "South Dakota": "46", "Tennessee": "47", "Texas": "48", "Utah": "49", "Vermont": "50",
+  "Virginia": "51", "Washington": "53", "West Virginia": "54", "Wisconsin": "55", "Wyoming": "56"
 };
 
-const FIPS_STATE = Object.fromEntries(Object.entries(STATE_FIPS).map(([k,v]) => [v, k]));
+const FIPS_STATE = Object.fromEntries(Object.entries(STATE_FIPS).map(([k, v]) => [v, k]));
 
 const riskColor = (r) => r === 'Low' ? '#00ea93' : r === 'Medium' ? '#ffcc00' : '#ff4d4d';
 const scoreColor = (s) => s >= 80 ? '#00ea93' : s >= 65 ? '#ffcc00' : '#ff4d4d';
@@ -39,8 +39,8 @@ const PlanningAgent = () => {
       .then(r => r.json())
       .then(d => { if (d.status === 'success') setAllStates(d.states); })
       .catch(() => setAllStates([
-        "California","Florida","Illinois","Nevada","New York","Ohio","Texas","Virginia","Washington",
-        "Arizona","Colorado","Georgia","Michigan","Minnesota","Oregon","Pennsylvania","Utah"
+        "California", "Florida", "Illinois", "Nevada", "New York", "Ohio", "Texas", "Virginia", "Washington",
+        "Arizona", "Colorado", "Georgia", "Michigan", "Minnesota", "Oregon", "Pennsylvania", "Utah"
       ]));
   }, []);
 
@@ -108,7 +108,11 @@ const PlanningAgent = () => {
       <Link to="/" className="back-button">← BACK TO MAP</Link>
 
       <div className="agent-header">
-        <div className="card-icon">🧠</div>
+        <div className="card-icon" style={{ width: '80px', height: '80px', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+
+          <img src="/planning_icon.png" alt="Planning Agent" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+
+        </div>
         <div>
           <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: '0.2rem', textAlign: 'left' }}>
             Global Planning Agent

@@ -14,16 +14,16 @@ const DataCenterDashboard = () => {
       ) : (
         <button className="back-button" onClick={() => setActiveTab(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ccc', textDecoration: 'none' }}>← BACK TO DATA CENTER Selection</button>
       )}
-      
+
       <div className="agent-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
         <div>
           <h1 className="hero-title" style={{ fontSize: '2.5rem', margin: '0', textAlign: 'left' }}>Data Center: {id.replace('dc_usa_', 'DC-USA-')}</h1>
           <p className="hero-subtitle" style={{ margin: 0, textAlign: 'left' }}>Unified diagnostic and operational view.</p>
         </div>
-        
+
         {activeTab !== null && (
           <div className="tabs" style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'operations' ? 'active' : ''}`}
               onClick={() => setActiveTab('operations')}
               style={{
@@ -38,7 +38,7 @@ const DataCenterDashboard = () => {
             >
               Operations Agent
             </button>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'maintenance' ? 'active' : ''}`}
               onClick={() => setActiveTab('maintenance')}
               style={{
@@ -60,22 +60,26 @@ const DataCenterDashboard = () => {
       <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {activeTab === null && (
           <div className="agents-grid" style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginTop: '2rem' }}>
-            <div 
-              className="agent-card" 
+            <div
+              className="agent-card"
               onClick={() => setActiveTab('operations')}
               style={{ cursor: 'pointer', border: '1px solid var(--accent-1)', flex: 1, maxWidth: '400px' }}
             >
-              <div className="card-icon">⚙️</div>
+              <div className="card-icon" style={{ width: '120px', height: '120px', marginBottom: '1.5rem' }}>
+                <img src="/operations.png" alt="Operations Agent" style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }} />
+              </div>
               <h2 className="card-title">Operations Agent</h2>
               <p className="card-description">Monitors real-time systems, automates daily tasks, and keeps the operational pipelines flowing.</p>
             </div>
-            
-            <div 
-              className="agent-card" 
+
+            <div
+              className="agent-card"
               onClick={() => setActiveTab('maintenance')}
               style={{ cursor: 'pointer', border: '1px solid var(--accent-2)', flex: 1, maxWidth: '400px' }}
             >
-              <div className="card-icon">🔧</div>
+              <div className="card-icon" style={{ width: '120px', height: '120px', marginBottom: '1.5rem' }}>
+                <img src="/Predictive.png" alt="Predictive Agent" style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }} />
+              </div>
               <h2 className="card-title">Predictive Maintenance</h2>
               <p className="card-description">Analyzes system health patterns to foresee critical failures and schedule pro-active repairs.</p>
             </div>
@@ -88,7 +92,7 @@ const DataCenterDashboard = () => {
             <OperationsAgent dcIdProp={id} />
           </div>
         )}
-        
+
         {activeTab === 'maintenance' && (
           <div>
             <PredictiveMaintenance dcIdProp={id} />

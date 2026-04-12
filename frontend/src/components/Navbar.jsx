@@ -10,7 +10,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-brand">
-        <span className="brand-accent">✦</span> Nexus
+        <span className="brand-accent">CM</span>
       </Link>
       <div className="navbar-links">
         <Link to="/planning" className={isActive('/planning')}>Planning</Link>
