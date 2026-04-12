@@ -25,12 +25,23 @@ structured_llm = llm.with_structured_output(AnomalyAnalysis)
 def fetch_metrics(state: OperationsState) -> dict:
     """Fetch real-time metrics for the facility via Redis."""
     dc_id = state.get("dc_id")
-    status = redis_client.get_state(f"dc:{dc_id}:status")
     
-    if not status:
+    # We now fetch the flat keys pushed by simulate_live_redis.py
+    keys_to_fetch = ["status", "temp", "cpu_load", "power_usage", "latency", "fan_speed_rpm", "network_bandwidth_gbps"]
+    metrics = {}
+    for k in keys_to_fetch:
+        val = redis_client.get_raw(f"dc:{dc_id}:{k}")
+        if val is not None:
+            # try converting to float if possible for cleaner LLM injection
+            try:
+                metrics[k] = float(val) if '.' in val else int(val)
+            except ValueError:
+                metrics[k] = val
+    
+    if not metrics:
         return {"metrics": {}, "status": "No Active Telemetry Found"}
     
-    return {"metrics": status, "status": "Metrics Fetched"}
+    return {"metrics": metrics, "status": "Metrics Fetched"}
 
 def analyze_anomalies(state: OperationsState) -> dict:
     """Analyze fetched metrics for anomalies and generate response."""

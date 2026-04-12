@@ -17,6 +17,10 @@ class RedisClient:
             return json.loads(val)
         return None
 
+    def get_raw(self, key: str) -> str:
+        return self.r.get(key)
+
+
     def push_event(self, q_key: str, event: str):
         self.r.lpush(q_key, event)
         self.r.ltrim(q_key, 0, 99) # keep last 100 events
