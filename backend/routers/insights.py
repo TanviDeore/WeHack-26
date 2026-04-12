@@ -1,6 +1,10 @@
 from fastapi import APIRouter
 from backend.database.redis_client import redis_client
 from backend.database.neo4j_client import neo4j_client
+import os
+import json
+from google import genai
+from google.genai import types
 
 router = APIRouter()
 
@@ -43,3 +47,60 @@ async def get_agent_context(dc_id: str):
     }
     
     return {"context": context}
+
+@router.get("/agent/predictive_maintenance/{dc_id}")
+async def get_predictive_maintenance(dc_id: str):
+    # Fetch data from Neo4j
+    neo4j_query = """
+    MATCH (dc:DataCenter {id: $dc_id})
+    OPTIONAL MATCH (dc)-[:LOCATED_IN]->(loc:Location)
+    OPTIONAL MATCH (dc)-[:USES_COOLING]->(cs:CoolingSystem)
+    OPTIONAL MATCH (dc)-[:EXPERIENCED]->(inc:Incident)
+    RETURN dc as datacenter, loc as location, cs as cooling_system, collect(inc) as past_incidents
+    """
+    db_data = neo4j_client.run_query(neo4j_query, {"dc_id": dc_id})
+    if not db_data:
+        return {"status": "error", "error": "Data center not found"}
+
+    context_data = db_data[0]
+    
+    # Initialize GenAI Client
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return {"status": "error", "error": "GEMINI_API_KEY not configured on server"}
+        
+    client = genai.Client(api_key=api_key)
+    
+    prompt = f"""
+    You are an AI Predictive Maintenance Agent for a Data Center.
+    Analyze the following Graph Database context for Data Center {dc_id} and predict potential incidents and recommend actions to prevent them.
+    
+    Context:
+    Data Center details: {context_data.get('datacenter')}
+    Location: {context_data.get('location')}
+    Cooling System: {context_data.get('cooling_system')}
+    Past Incidents: {context_data.get('past_incidents')}
+    
+    Output a JSON object with this exact structure:
+    {{
+        "potential_incidents": [
+            {{"incident_type": "string", "probability": "High|Medium|Low", "reason": "string"}}
+        ],
+        "recommended_actions": [
+            {{"action_name": "string", "description": "string", "priority": "High|Medium|Low", "expected_outcome": "string"}}
+        ]
+    }}
+    """
+    
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+            ),
+        )
+        prediction_json = json.loads(response.text)
+        return {"status": "success", "data": prediction_json}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
