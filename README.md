@@ -39,7 +39,6 @@ ii. Short-Term Memory (Redis) - High-speed ingestion of live telemetry:
 
 - Temperature, CPU load, network gbps, fan speed, latency, power usage.
 - Real-time system states
-- GraphRAG Pipeline
 - Combines retrieval from graph memory with LLM reasoning for context-aware decisions
 
 *Agent Orchestration*
