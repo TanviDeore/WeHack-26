@@ -17,6 +17,18 @@ const STATE_COORDS = {
   "Washington": [-120.7401, 47.7511]
 };
 
+const STATE_ABBR = {
+  "California": "CA",
+  "Florida": "FL",
+  "Illinois": "IL",
+  "Nevada": "NV",
+  "New York": "NY",
+  "Ohio": "OH",
+  "Texas": "TX",
+  "Virginia": "VA",
+  "Washington": "WA"
+};
+
 // Deterministic pseudo-random number generator
 const prng = (seed) => {
   let x = Math.sin(seed++) * 10000;
@@ -117,6 +129,18 @@ const Home = () => {
               ))
             }
           </Geographies>
+
+          {Object.entries(STATE_COORDS).map(([stateName, coords]) => (
+            <Marker key={`label-${stateName}`} coordinates={coords}>
+              <text
+                textAnchor="middle"
+                y={-18}
+                style={{ fontFamily: 'Inter, system-ui, sans-serif', fill: 'rgba(255, 255, 255, 0.4)', fontSize: '10px', fontWeight: 'bold', pointerEvents: 'none' }}
+              >
+                {STATE_ABBR[stateName]}
+              </text>
+            </Marker>
+          ))}
 
           {markers.map((marker) => (
             <Marker 

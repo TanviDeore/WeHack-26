@@ -78,8 +78,19 @@ async def get_predictive_maintenance(dc_id: str):
 
     context_data = db_data[0]
     
-    # Check live status from Redis to dictate logic
+    # Fetch comprehensive live status from Redis to dictate logic
     redis_status = redis_client.get_state(f"dc:{dc_id}:status") or "optimal"
+    live_telemetry = {
+        "status": redis_status,
+        "temp": redis_client.get_state(f"dc:{dc_id}:temp"),
+        "cpu_load": redis_client.get_state(f"dc:{dc_id}:cpu_load"),
+        "power_usage": redis_client.get_state(f"dc:{dc_id}:power_usage"),
+        "latency": redis_client.get_state(f"dc:{dc_id}:latency"),
+        "fan_speed_rpm": redis_client.get_state(f"dc:{dc_id}:fan_speed_rpm"),
+        "coolant_temp_out": redis_client.get_state(f"dc:{dc_id}:coolant_temp_out"),
+        "power_draw_kw": redis_client.get_state(f"dc:{dc_id}:power_draw_kw"),
+        "network_bandwidth_gbps": redis_client.get_state(f"dc:{dc_id}:network_bandwidth_gbps")
+    }
     
     # Initialize GenAI Client
     api_key = os.getenv("GEMINI_API_KEY")
@@ -105,6 +116,7 @@ async def get_predictive_maintenance(dc_id: str):
     Location & Climate: {context_data.get('location')}
     Cooling System: {context_data.get('cooling_system')}
     Past Incidents & Hardware Failures: {context_data.get('past_incidents')}
+    Real-Time LIVE Telemetry: {live_telemetry}
     
     Output a JSON object with this exact structure:
     {{
@@ -218,20 +230,31 @@ async def get_predictive_maintenance(dc_id: str):
         ]
         
         pool = optimal_scenarios if redis_status == "optimal" else degraded_scenarios
-        chosen = random.choice(pool)
+        
+        # Determine if we should report "All Clear"
+        if redis_status == "optimal" and random.random() > 0.5:
+            # No action required
+            mock_fallback["potential_incidents"].append({
+                "incident_type": "None detected",
+                "probability": "Low",
+                "reason": "All systems operating within optimal bounds."
+            })
+            # recommended_actions stays empty
+        else:
+            chosen = random.choice(pool)
 
-        mock_fallback["potential_incidents"].append({
-            "incident_type": chosen["incident"],
-            "probability": "Low" if redis_status == "optimal" else "High",
-            "reason": chosen.get("failure_reason", "Failure cascade triggers when operating consistently outside of target bounds.")
-        })
-        mock_fallback["recommended_actions"].append({
-            "action_name": chosen["action"],
-            "description": chosen["desc"],
-            "priority": "Medium" if redis_status == "optimal" else "Critical",
-            "expected_outcome": "Guarantees sustained uptime and lowers degradation.",
-            "simulation": chosen["sim"]
-        })
+            mock_fallback["potential_incidents"].append({
+                "incident_type": chosen["incident"],
+                "probability": "Low" if redis_status == "optimal" else "High",
+                "reason": chosen.get("failure_reason", "Failure cascade triggers when operating consistently outside of target bounds.")
+            })
+            mock_fallback["recommended_actions"].append({
+                "action_name": chosen["action"],
+                "description": chosen["desc"],
+                "priority": "Medium" if redis_status == "optimal" else "Critical",
+                "expected_outcome": "Guarantees sustained uptime and lowers degradation.",
+                "simulation": chosen["sim"]
+            })
             
         return {"status": "success", "data": mock_fallback}
 

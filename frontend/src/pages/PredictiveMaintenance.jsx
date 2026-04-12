@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const PredictiveMaintenance = ({ dcIdProp }) => {
   const [loading, setLoading] = useState(false);
@@ -8,6 +8,7 @@ const PredictiveMaintenance = ({ dcIdProp }) => {
   const [datacenters, setDatacenters] = useState([]);
   const [selectedDc, setSelectedDc] = useState(dcIdProp || '');
   const [actionSimValue, setActionSimValue] = useState({});
+  const navigate = useNavigate();
 
   // Sync prop changes
   useEffect(() => {
@@ -65,44 +66,44 @@ const PredictiveMaintenance = ({ dcIdProp }) => {
   };
 
   const handleNextLog = () => {
-    if (datacenters.length === 0) return;
-    const currentIndex = datacenters.findIndex(dc => dc.id === selectedDc);
-    const nextIndex = (currentIndex + 1) % datacenters.length;
-    setSelectedDc(datacenters[nextIndex].id);
+    // Just check the real-time data for the current datacenter again (fetch new log)
+    runAnalysis();
   };
 
   return (
     <div className={dcIdProp ? "" : "agent-page-container"}>
       {!dcIdProp && <Link to="/" className="back-button">← BACK TO HUB</Link>}
       
-      {!dcIdProp && (
-        <div className="agent-header">
-          <div className="card-icon">🔧</div>
-          <div style={{ flex: 1 }}>
-            <h1 className="hero-title" style={{ fontSize: '3rem', margin: '0', textAlign: 'left' }}>Predictive Maintenance</h1>
-            <p className="hero-subtitle" style={{ margin: 0, textAlign: 'left' }}>System Health & Analytics</p>
-          </div>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              {selectedDc && <span style={{ color: '#00ea93', fontWeight: 'bold' }}>Active Target: {datacenters.find(d => d.id === selectedDc)?.name}</span>}
-              <button 
-                  className="action-button" 
-                  onClick={runAnalysis} 
-                  disabled={loading || !selectedDc}
-                  style={{ padding: '0.8rem 1.5rem', background: '#00ea93', color: '#0a0a0a', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: (loading || !selectedDc) ? 'not-allowed' : 'pointer' }}
-              >
-                {loading ? 'Analyzing...' : 'Re-Analyze Outcome'}
-              </button>
-              <button 
-                  className="action-button" 
-                  onClick={handleNextLog} 
-                  disabled={loading || datacenters.length === 0}
-                  style={{ padding: '0.8rem 1.5rem', background: 'transparent', color: '#00ea93', border: '1px solid #00ea93', borderRadius: '8px', fontWeight: 'bold', cursor: (loading || datacenters.length === 0) ? 'not-allowed' : 'pointer' }}
-              >
-                Next Log &rarr;
-              </button>
-          </div>
+      <div className="agent-header" style={dcIdProp ? { padding: '0', background: 'transparent', border: 'none', marginBottom: '1rem', minHeight: 'auto' } : {}}>
+        {!dcIdProp && (
+          <>
+            <div className="card-icon">🔧</div>
+            <div style={{ flex: 1 }}>
+              <h1 className="hero-title" style={{ fontSize: '3rem', margin: '0', textAlign: 'left' }}>Predictive Maintenance</h1>
+              <p className="hero-subtitle" style={{ margin: 0, textAlign: 'left' }}>System Health & Analytics</p>
+            </div>
+          </>
+        )}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: dcIdProp ? 'auto' : '0' }}>
+            {selectedDc && <span style={{ color: '#00ea93', fontWeight: 'bold' }}>Active Target: {datacenters.find(d => d.id === selectedDc)?.name}</span>}
+            <button 
+                className="action-button" 
+                onClick={runAnalysis} 
+                disabled={loading || !selectedDc}
+                style={{ padding: '0.8rem 1.5rem', background: '#00ea93', color: '#0a0a0a', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: (loading || !selectedDc) ? 'not-allowed' : 'pointer' }}
+            >
+              {loading ? 'Analyzing...' : 'Re-Analyze Outcome'}
+            </button>
+            <button 
+                className="action-button" 
+                onClick={handleNextLog} 
+                disabled={loading || datacenters.length === 0}
+                style={{ padding: '0.8rem 1.5rem', background: 'transparent', color: '#00ea93', border: '1px solid #00ea93', borderRadius: '8px', fontWeight: 'bold', cursor: (loading || datacenters.length === 0) ? 'not-allowed' : 'pointer' }}
+            >
+              Next Log &rarr;
+            </button>
         </div>
-      )}
+      </div>
       <div className="agent-workspace" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', minHeight: '60vh' }}>
         {!data && !loading && !error && (
             <div className="workspace-status">SYSTEM IDLE // AWAITING COMMANDS</div>
