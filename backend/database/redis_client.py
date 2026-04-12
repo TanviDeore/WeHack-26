@@ -11,10 +11,13 @@ class RedisClient:
     def set_state(self, key: str, value: dict):
         self.r.set(key, json.dumps(value))
 
-    def get_state(self, key: str) -> dict:
+    def get_state(self, key: str):
         val = self.r.get(key)
         if val:
-            return json.loads(val)
+            try:
+                return json.loads(val)
+            except json.JSONDecodeError:
+                return val
         return None
 
     def push_event(self, q_key: str, event: str):

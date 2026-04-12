@@ -11,13 +11,13 @@ def simulate_realtime_data():
     print("🚀 Starting Live Redis Log Simulator...")
     print("Press Ctrl+C to stop.")
     
-    datacenters = ["texas", "oslo", "sg"]
+    datacenters = [f"dc_usa_{i}" for i in range(1, 51)]
     
     try:
         while True:
             for dc in datacenters:
                 # 1. Base metrics (Normal Operation)
-                is_incident = (dc == "texas" and random.random() > 0.7) # Texas has occasional incident spikes
+                is_incident = (dc == "dc_usa_1" and random.random() > 0.7) # dc_usa_1 has occasional incident spikes
                 
                 status = "degraded" if is_incident else "optimal"
                 temp = random.randint(88, 98) if is_incident else random.randint(65, 75)
@@ -45,12 +45,12 @@ def simulate_realtime_data():
                 # 3. Handle Active Alerts
                 if is_incident:
                     r.set(f"alert:{dc}", "CRITICAL: Cooling stress detected. Immediate mitigation required.")
-                    r.lpush(f"recent:event:{dc}", f"TEMP_SPIKE: {temp}C at {time.strftime('%H:%M:%S')}")
+                    r.lpush(f"recent:event:{dc}", f"TEMP_SPIKE: {temp}F at {time.strftime('%H:%M:%S')}")
                     r.ltrim(f"recent:event:{dc}", 0, 99) # Keep last 100
                 else:
                     r.delete(f"alert:{dc}") # Clear alert if normal
 
-            print(f"[{time.strftime('%H:%M:%S')}] Pushed live metrics for {len(datacenters)} Data Centers. (Texas Status: {r.get('dc:texas:status')})")
+            print(f"[{time.strftime('%H:%M:%S')}] Pushed live metrics for {len(datacenters)} Data Centers. (DC 1 Status: {r.get('dc:dc_usa_1:status')})")
             
             # Send data every 3 seconds
             time.sleep(3)

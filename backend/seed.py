@@ -91,8 +91,9 @@ def generate_synthetic_graph_data():
 
     # 4. Generate 1000 Entries (Incidents, Maintenance, Performance)
     print("Injecting 1000 synthetic entries... This may take a minute.")
-    incident_types = ['overheating', 'power_surge', 'network_latency', 'cooling_failure']
-    maintenance_types = ['cooling_upgrade', 'server_rack_replacement', 'hvac_calibration', 'power_grid_sync']
+    incident_types = ['overheating', 'power_surge', 'network_latency', 'cooling_failure', 'cpu_bottleneck', 'high_pue_violation', 'brownout']
+    maintenance_types = ['cooling_upgrade', 'server_rack_replacement', 'hvac_calibration', 'power_grid_sync', 'cpu_cluster_upgrade', 'load_balancer_tuning']
+    
     
     for i in range(1, 1001):
         target_dc = random.choice(datacenters)
@@ -104,15 +105,20 @@ def generate_synthetic_graph_data():
             "severity": random.choice(["low", "medium", "high", "critical"]),
             "timestamp": (datetime.now() - timedelta(days=random.randint(1, 1500))).strftime("%Y-%m-%d"),
             "duration_minutes": random.randint(15, 240),
-            "root_cause": random.choice(["cooling_failure", "grid_instability", "hardware_aging"])
+            "root_cause": random.choice(["cooling_failure", "grid_instability", "hardware_aging", "high_cpu_spike", "external_grid_failure", "aging_psu", "ambient_weather_anomaly"])
         }
         
         maint_id = f"maintenance_{i}"
+        maint_effect = "improved_stability"
+        if inc["type"] == "overheating": maint_effect = "reduced_overheating"
+        elif inc["type"] == "cpu_bottleneck": maint_effect = "optimized_compute_load"
+        elif "power" in inc["type"] or "brownout" in inc["type"]: maint_effect = "stabilized_pue"
+        
         maint = {
             "id": maint_id,
             "type": random.choice(maintenance_types),
             "cost_level": random.choice(["low", "medium", "high"]),
-            "effect": "reduced_overheating" if inc["type"] == "overheating" else "improved_stability"
+            "effect": maint_effect
         }
         
         perf_id = f"perf_{i}"
