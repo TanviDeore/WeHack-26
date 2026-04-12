@@ -409,6 +409,28 @@ body::after { background: var(--accent-2); bottom: -20%; right: -10%; animation-
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
 }
 
+.reject-btn {
+  margin-top: 1.5rem;
+  background: transparent;
+  border: 2px solid var(--accent-3);
+  color: var(--accent-3);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reject-btn:hover {
+  background: var(--accent-3);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 0, 60, 0.4);
+}
+
 /* Animations */
 @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }

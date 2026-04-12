@@ -20,7 +20,7 @@ def simulate_realtime_data():
                 is_incident = (dc == "texas" and random.random() > 0.7) # Texas has occasional incident spikes
                 
                 status = "degraded" if is_incident else "optimal"
-                temp = random.randint(88, 98) if is_incident else random.randint(65, 75)
+                temp = random.randint(85, 105) if is_incident else random.randint(65, 75)
                 cpu_load = random.randint(85, 99) if is_incident else random.randint(30, 60)
                 power_usage = random.randint(75, 95) if is_incident else random.randint(40, 60)
                 latency = random.randint(100, 250) if is_incident else random.randint(15, 30)
@@ -30,7 +30,7 @@ def simulate_realtime_data():
                 coolant_temp_out = temp - random.randint(2, 5) if is_incident else temp - 15
                 power_draw_kw = power_usage * random.randint(10, 15)
                 network_bandwidth_gbps = random.uniform(8.0, 10.0) if is_incident else random.uniform(2.0, 5.0)
-                
+                coolant_temp_out = (temp + random.randint(30, 50)) if is_incident else (temp + 15)
                 # 2. Write to flat Redis Keys
                 r.set(f"dc:{dc}:status", status)
                 r.set(f"dc:{dc}:temp", temp)
