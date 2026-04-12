@@ -254,9 +254,6 @@ const PlanningAgent = () => {
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: '#aaa' }}>
                   <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#00ccff', display: 'inline-block' }} /> Alternate
                 </span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: '#aaa' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#888', display: 'inline-block' }} /> Existing DC
-                </span>
               </div>
 
               <ComposableMap projection="geoAlbersUsa" style={{ width: '100%', height: 'auto' }}>
@@ -300,15 +297,6 @@ const PlanningAgent = () => {
                       <text textAnchor="middle" y={-12} style={{ fontSize: '9px', fill: '#00ccff' }}>
                         {alt.state}
                       </text>
-                    </Marker>
-                  )
-                ))}
-
-                {/* Existing DC markers */}
-                {result.existing_dcs?.slice(0, 20).map(dc => (
-                  dc.longitude && dc.latitude && (
-                    <Marker key={dc.id} coordinates={[dc.longitude, dc.latitude]}>
-                      <circle r={3} fill="#555" opacity={0.7} />
                     </Marker>
                   )
                 ))}

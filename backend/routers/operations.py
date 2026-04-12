@@ -56,6 +56,7 @@ async def record_feedback(payload: FeedbackPayload):
     try:
         timestamp = datetime.now().isoformat()
         incident_id = f"inc_{payload.dc_id}_{int(datetime.now().timestamp())}"
+        maint_id = f"maint_{payload.dc_id}_{int(datetime.now().timestamp())}"
         
         query = """
         MERGE (dc:DataCenter {id: $dc_id})
@@ -66,19 +67,22 @@ async def record_feedback(payload: FeedbackPayload):
             severity: $severity,
             timestamp: $ts
         })
-        CREATE (a:Action {
+        CREATE (m:MaintenanceEvent {
+            id: $maint_id,
             type: $action, 
+            effect: "operator_verified_resolution",
             timestamp: $ts, 
             anomalies_resolved: $anomalies
         })
         MERGE (dc)-[:EXPERIENCED]->(inc)
-        MERGE (a)-[:RESOLVED_BY]->(inc)
-        MERGE (dc)-[:TOOK_ACTION]->(a)
-        RETURN a
+        MERGE (m)-[:RESOLVED_BY]->(inc)
+        MERGE (dc)-[:TOOK_ACTION]->(m)
+        RETURN m
         """
         neo4j_client.run_query(query, {
             "dc_id": payload.dc_id,
             "inc_id": incident_id,
+            "maint_id": maint_id,
             "incident_type": payload.anomalies[0] if payload.anomalies else "Telemetry Anomaly",
             "root_cause": payload.root_cause,
             "severity": payload.severity,
