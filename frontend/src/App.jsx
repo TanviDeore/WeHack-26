@@ -5,6 +5,8 @@ import PlanningAgent from './pages/PlanningAgent';
 import OperationsAgent from './pages/OperationsAgent';
 import PredictiveMaintenance from './pages/PredictiveMaintenance';
 
+import DataCenterDashboard from './pages/DataCenterDashboard';
+
 function App() {
   return (
     <Router>
@@ -12,6 +14,7 @@ function App() {
       <div className="page-container">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/datacenter/:id" element={<DataCenterDashboard />} />
           <Route path="/planning" element={<PlanningAgent />} />
           <Route path="/operations" element={<OperationsAgent />} />
           <Route path="/maintenance" element={<PredictiveMaintenance />} />

@@ -2,14 +2,19 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const OperationsAgent = () => {
-  const [dcId, setDcId] = useState('texas');
+const OperationsAgent = ({ dcIdProp }) => {
+  const [dcId, setDcId] = useState(dcIdProp || 'texas');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [actionStatus, setActionStatus] = useState({}); // { title: 'committing' | 'success' }
   const [liveMetrics, setLiveMetrics] = useState({});
   const [autoScan, setAutoScan] = useState(true);
   const [metricsHistory, setMetricsHistory] = useState([]);
+
+  // Sync prop changes
+  useEffect(() => {
+    if (dcIdProp) setDcId(dcIdProp);
+  }, [dcIdProp]);
 
   // Reset history on DC change
   useEffect(() => {
@@ -161,16 +166,18 @@ const OperationsAgent = () => {
     : liveMetrics;
 
   return (
-    <div className="agent-page-container">
-      <Link to="/" className="back-button">← BACK TO HUB</Link>
+    <div className={dcIdProp ? "" : "agent-page-container"}>
+      {!dcIdProp && <Link to="/" className="back-button">← BACK TO HUB</Link>}
 
-      <div className="agent-header">
-        <div className="card-icon">⚙️</div>
-        <div>
-          <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: '0.2rem', textAlign: 'left' }}>Operations Agent</h1>
-          <p className="hero-subtitle" style={{ margin: 0, textAlign: 'left' }}>Auto-Pilot GraphRAG System</p>
+      {!dcIdProp && (
+        <div className="agent-header">
+          <div className="card-icon">⚙️</div>
+          <div>
+            <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: '0.2rem', textAlign: 'left' }}>Operations Agent</h1>
+            <p className="hero-subtitle" style={{ margin: 0, textAlign: 'left' }}>Auto-Pilot GraphRAG System</p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="agent-workspace" style={{ padding: '2rem' }}>
         <div className="operations-dashboard">
@@ -179,13 +186,15 @@ const OperationsAgent = () => {
           <div className={`panel ${hasAnomalies || liveMetrics.status === 'degraded' ? 'critical' : ''}`}>
             <div className="panel-header">
               <span>Sentinel Feed</span>
-              <input
-                type="text"
-                value={dcId}
-                onChange={(e) => setDcId(e.target.value)}
-                disabled={!autoScan}
-                style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border)', color: '#fff', padding: '0.4rem 0.8rem', borderRadius: '4px', width: '100px' }}
-              />
+              {!dcIdProp && (
+                <input
+                  type="text"
+                  value={dcId}
+                  onChange={(e) => setDcId(e.target.value)}
+                  disabled={!autoScan}
+                  style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border)', color: '#fff', padding: '0.4rem 0.8rem', borderRadius: '4px', width: '100px' }}
+                />
+              )}
             </div>
 
             <button

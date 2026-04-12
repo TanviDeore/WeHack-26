@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from typing import Optional
 from backend.agents.operations.graph import operations_graph
 from backend.database.neo4j_client import neo4j_client
 from backend.database.redis_client import redis_client
@@ -11,8 +12,8 @@ class FeedbackPayload(BaseModel):
     dc_id: str
     anomalies: list[str]
     action_taken: str
-    root_cause: str | None = "unknown"
-    severity: str | None = "medium"
+    root_cause: Optional[str] = "unknown"
+    severity: Optional[str] = "medium"
 
 @router.get("/agent/operations/{dc_id}")
 async def run_operations_agent(dc_id: str):
@@ -51,7 +52,7 @@ async def record_feedback(payload: FeedbackPayload):
     """Record operator action into Neo4j graph connecting to DataCenter."""
     try:
         timestamp = datetime.now().isoformat()
-        incident_id = f"inc_{dc_id}_{int(datetime.now().timestamp())}"
+        incident_id = f"inc_{payload.dc_id}_{int(datetime.now().timestamp())}"
         
         query = """
         MERGE (dc:DataCenter {id: $dc_id})
