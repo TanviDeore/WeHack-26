@@ -14,11 +14,13 @@ i. Real-Time Operations Module - Detects present anomalies and resolves them usi
 Monitors live metrics like temperature, load, and power usage.
 Detects anomalies and triggers alerts.
 Suggests actions based on historical patterns.
+
 ii. Predictive Maintenance Module - Simulates future scenarios and predicts failures before they happen.
 
 Uses historical data to predict potential failures.
 Recommends preventive actions before incidents occur.
 Reduces downtime and operational risks.
+
 iii. Planning Module - Recommends optimal expansion strategies using historical data.
 
 Suggests optimal data center locations.
